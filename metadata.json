@@ -1,0 +1,7 @@
+{
+  "name": "Gemini Live Voice Assistant",
+  "description": "A real-time conversational voice application powered by Gemini 2.5 Native Audio. Experience low-latency, human-like voice interactions with live visualizers and transcriptions.",
+  "requestFramePermissions": [
+    "microphone"
+  ]
+}
