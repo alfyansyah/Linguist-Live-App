@@ -15,20 +15,20 @@ const OUTPUT_SAMPLE_RATE = 24000;
 const MODEL_NAME = 'gemini-2.5-flash-native-audio-preview-12-2025';
 
 const PRESET_TOPICS = [
-  { id: 'daily', label: 'Daily Life', icon: '🏠', desc: 'Rutinitas harian & kebiasaan' },
-  { id: 'travel', label: 'Travel', icon: '✈️', desc: 'Petualangan & liburan' },
-  { id: 'food', label: 'Food & Dining', icon: '🍕', desc: 'Restoran & hobi masak' },
-  { id: 'career', label: 'Career', icon: '💼', desc: 'Dunia kerja & interview' },
-  { id: 'hobby', label: 'Entertainment', icon: '🎮', desc: 'Film, game & hobi' },
-  { id: 'scifi', label: 'Sci-Fi Future', icon: '🚀', desc: 'Dunia masa depan' },
+  { id: 'daily', label: 'Kehidupan Sehari-hari', icon: '🏠', desc: 'Rutinitas & kebiasaan' },
+  { id: 'travel', label: 'Wisata & Liburan', icon: '✈️', desc: 'Perjalanan & petualangan' },
+  { id: 'food', label: 'Kuliner', icon: '🍕', desc: 'Makanan & restoran' },
+  { id: 'career', label: 'Karier & Kerja', icon: '💼', desc: 'Dunia kerja & bisnis' },
+  { id: 'hobby', label: 'Hobi & Hiburan', icon: '🎮', desc: 'Musik, film & game' },
+  { id: 'scifi', label: 'Masa Depan', icon: '🚀', desc: 'Teknologi & imajinasi' },
 ];
 
 const ACTION_CHIPS = [
-  "Bisa berikan kata yang lebih sulit?",
-  "Apa ada idiom untuk topik ini?",
-  "Tolong jelaskan grammar tadi.",
-  "Ganti ke topik masa lalu.",
-  "Bicara lebih pelan, tolong."
+  "Berikan kata yang lebih sulit",
+  "Apa ada idiom untuk ini?",
+  "Jelaskan tata bahasa tadi",
+  "Ubah ke topik masa lalu",
+  "Bicara lebih pelan, tolong"
 ];
 
 const App: React.FC = () => {
@@ -38,10 +38,10 @@ const App: React.FC = () => {
   const [currentOutput, setCurrentOutput] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [learningConfig, setLearningConfig] = useState<LearningConfig>({
-    language: 'English',
+    language: 'Inggris',
     level: 'Intermediate',
     focus: 'Fluency',
-    topic: 'Daily Life',
+    topic: 'Kehidupan Sehari-hari',
     currentTense: 'Present (Situasi)'
   });
   const [customTopic, setCustomTopic] = useState('');
@@ -54,14 +54,12 @@ const App: React.FC = () => {
   const nextStartTimeRef = useRef<number>(0);
   const sessionRef = useRef<any>(null);
 
-  // Detect Tense Change based on model output content
   useEffect(() => {
     if (currentOutput) {
       const lower = currentOutput.toLowerCase();
-      // Simple heuristic pemicu perubahan status bar
-      if (lower.includes("yesterday") || lower.includes("happened") || lower.includes("was it") || lower.includes("did you")) {
+      if (lower.includes("dulu") || lower.includes("kemarin") || lower.includes("masa lalu") || lower.includes("telah")) {
         setLearningConfig(prev => ({ ...prev, currentTense: 'Past (Masa Lalu)' }));
-      } else if (lower.includes("tomorrow") || lower.includes("future") || lower.includes("will you") || lower.includes("going to")) {
+      } else if (lower.includes("besok") || lower.includes("nanti") || lower.includes("rencana") || lower.includes("akan datang")) {
         setLearningConfig(prev => ({ ...prev, currentTense: 'Future (Rencana)' }));
       }
     }
@@ -117,22 +115,22 @@ const App: React.FC = () => {
       const activeTopic = customTopic || learningConfig.topic;
 
       const systemInstruction = `
-        You are "Linguist Mentor", an elite AI language coach. 
-        GOAL: Guide the user to mastery in ${learningConfig.language} (Level: ${learningConfig.level}).
-        TARGET TOPIC: ${activeTopic}.
+        Identitas: Anda adalah "Linguist Mentor", pelatih bahasa elit.
+        BAHASA PENGANTAR: Anda WAJIB menggunakan BAHASA INDONESIA untuk memberikan instruksi, koreksi, dan penjelasan.
+        TARGET PEMBELAJARAN: Membimbing pengguna untuk mahir bahasa ${learningConfig.language} (Level: ${learningConfig.level}).
+        TOPIK SAAT INI: ${activeTopic}.
 
-        STRUCTURE (THE GRAMMAR LADDER):
-        - STEP 1 (Present/Situational): Start by exploring the topic in the present. Use simple present/continuous.
-        - STEP 2 (Past/Narrative): After a few turns, smoothly bridge to the PAST. Ask about their previous experiences related to ${activeTopic}.
-        - STEP 3 (Future/Hypothetical): Finally, push them to use future tenses or conditionals (e.g., "What if...", "Next time...", "In 10 years...").
+        LOGIKA TANGGA TATA BAHASA (GRAMMAR LADDER):
+        - LANGKAH 1 (Present): Ajak pengguna berdiskusi tentang kondisi saat ini terkait ${activeTopic}.
+        - LANGKAH 2 (Past): Setelah beberapa saat, tarik pengguna ke masa lalu (misal: "Apa kamu pernah melakukannya dulu?").
+        - LANGKAH 3 (Future/Hypothetical): Dorong pengguna berimajinasi tentang masa depan terkait ${activeTopic}.
 
-        MANDATORY RULES:
-        1. PROACTIVE ENGAGEMENT: Never end a turn without an open-ended question.
-        2. NO DEAD ENDS: If the user gives a short answer, elaborate with an interesting fact or idiom about ${activeTopic} before questioning.
-        3. SANDWICH FEEDBACK: If you hear an error, validate the meaning first, then provide "Correction: [Corrected sentence]" and a 1-sentence explanation, then continue the flow.
-        4. TENSE DRIFTING: You must proactively "drift" the conversation across different tenses as per the ladder.
+        ATURAN WAJIB:
+        1. GUNAKAN BAHASA INDONESIA untuk menyapa, memberi umpan balik, dan menjelaskan tata bahasa. Gunakan bahasa target (${learningConfig.language}) hanya saat memberikan contoh atau menantang pengguna.
+        2. FEEDBACK SANDWICH: Jika pengguna salah, validasi dalam Bahasa Indonesia, berikan "Koreksi: [Kalimat Benar]" dalam bahasa target, lalu berikan pertanyaan tantangan baru.
+        3. JANGAN PERNAH DIAM: Selalu akhiri giliran bicara Anda dengan pertanyaan terbuka dalam Bahasa Indonesia (atau campuran dengan bahasa target).
         
-        TONE: Encouraging, professional, and intellectually stimulating.
+        NADA: Ramah, profesional, dan sangat edukatif.
       `;
 
       const sessionPromise = ai.live.connect({
@@ -178,7 +176,7 @@ const App: React.FC = () => {
               });
               setCurrentOutput(fullOut => {
                 if (fullOut.trim()) {
-                  const isCorrection = fullOut.toLowerCase().includes('correction:') || fullOut.toLowerCase().includes('tip:');
+                  const isCorrection = fullOut.toLowerCase().includes('koreksi:') || fullOut.toLowerCase().includes('tip:');
                   setMessages(prev => [...prev, { 
                     id: Date.now().toString() + '-out', 
                     role: 'model', 
@@ -256,7 +254,6 @@ const App: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col p-4 md:p-6 max-w-7xl mx-auto h-screen overflow-hidden">
-      {/* Header */}
       <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6 flex-shrink-0">
         <div className="flex items-center gap-4">
           <div className="w-12 h-12 bg-emerald-600 rounded-2xl flex items-center justify-center shadow-lg shadow-emerald-900/40 transform -rotate-3 hover:rotate-0 transition-transform">
@@ -276,7 +273,7 @@ const App: React.FC = () => {
             status === SessionStatus.CONNECTING ? 'bg-amber-500/10 border-amber-500/50 text-amber-400 animate-pulse' : 
             'bg-slate-800 border-slate-700 text-slate-500'
           }`}>
-            {status}
+            {status === SessionStatus.CONNECTED ? 'Tersambung' : status === SessionStatus.CONNECTING ? 'Menghubungkan' : 'Terputus'}
           </div>
           <button
             onClick={() => status === SessionStatus.CONNECTED ? disconnect() : connect()}
@@ -286,7 +283,7 @@ const App: React.FC = () => {
                 : 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-emerald-900/20'
             }`}
           >
-            {status === SessionStatus.CONNECTED ? 'Stop Session' : 'Start Mentor'}
+            {status === SessionStatus.CONNECTED ? 'Hentikan Sesi' : 'Mulai Belajar'}
           </button>
         </div>
       </header>
@@ -301,7 +298,6 @@ const App: React.FC = () => {
       )}
 
       <main className="flex-1 grid grid-cols-1 lg:grid-cols-3 gap-6 min-h-0 overflow-hidden">
-        {/* Left Column: Config & Tools */}
         <div className={`space-y-6 lg:col-span-1 transition-opacity ${status === SessionStatus.CONNECTED ? 'opacity-40 pointer-events-none' : 'opacity-100'}`}>
           <div className="bg-slate-900/50 border border-slate-800 rounded-3xl p-6 backdrop-blur-sm">
             <h2 className="text-slate-400 text-xs font-bold uppercase tracking-wider mb-4 flex items-center gap-2">
@@ -326,21 +322,18 @@ const App: React.FC = () => {
             <div className="relative">
               <input 
                 type="text"
-                placeholder="Atau ketik topik bebas..."
+                placeholder="Ketik topik khusus Anda..."
                 value={customTopic}
                 onChange={(e) => setCustomTopic(e.target.value)}
                 className="w-full bg-slate-950 border border-slate-800 rounded-xl py-3 px-4 text-sm focus:outline-none focus:border-emerald-500 transition-colors placeholder:text-slate-600"
               />
-              <div className="absolute right-3 top-3.5 text-slate-700 pointer-events-none">
-                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" strokeWidth={2}/></svg>
-              </div>
             </div>
           </div>
 
           <div className="bg-slate-900/50 border border-slate-800 rounded-3xl p-6 backdrop-blur-sm">
             <h2 className="text-slate-400 text-xs font-bold uppercase tracking-wider mb-4 flex items-center gap-2">
               <span className="w-1 h-3 bg-cyan-500 rounded-full"></span>
-              Focus Level
+              Level Kemampuan
             </h2>
             <div className="grid grid-cols-4 gap-2">
               {['Starter', 'Beginner', 'Intermediate', 'Advanced'].map(lvl => (
@@ -358,14 +351,12 @@ const App: React.FC = () => {
           </div>
         </div>
 
-        {/* Right Column: Interaction Hub */}
         <div className="lg:col-span-2 flex flex-col min-h-0 relative">
-          {/* Grammar Ladder Indicator */}
           {status === SessionStatus.CONNECTED && (
             <div className="bg-slate-900/80 border border-slate-800 backdrop-blur-md rounded-2xl p-4 mb-4 flex items-center justify-between gap-6 animate-in fade-in slide-in-from-right-4">
               <div className="flex-1">
                 <div className="flex justify-between mb-2">
-                   <span className="text-[10px] font-bold text-slate-500 uppercase">Grammar Progression</span>
+                   <span className="text-[10px] font-bold text-slate-500 uppercase">Progres Tata Bahasa</span>
                    <span className="text-[10px] font-bold text-emerald-400 uppercase tracking-widest">{learningConfig.currentTense}</span>
                 </div>
                 <div className="flex gap-2 h-1.5">
@@ -378,22 +369,25 @@ const App: React.FC = () => {
                 </div>
               </div>
               <div className="bg-slate-800 rounded-lg px-3 py-1 border border-slate-700 text-[10px] font-bold text-slate-300">
-                SCENARIO: {customTopic || learningConfig.topic}
+                SKENARIO: {customTopic || learningConfig.topic}
               </div>
             </div>
           )}
 
-          {/* Transcript Area */}
           <Transcript messages={messages} currentInput={currentInput} currentOutput={currentOutput} />
 
-          {/* Footer Tools */}
           <div className="mt-4 flex flex-col gap-3 flex-shrink-0">
              {status === SessionStatus.CONNECTED && (
                <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
                  {ACTION_CHIPS.map((chip, idx) => (
                    <button 
                     key={idx}
-                    onClick={() => alert(`Coba katakan: "${chip}"`)}
+                    onClick={() => {
+                       if (sessionRef.current) {
+                          // Simple mock sending text if needed, or just visual reminder
+                          alert(`Cobalah bicara: "${chip}"`);
+                       }
+                    }}
                     className="whitespace-nowrap bg-slate-800/60 hover:bg-slate-700 border border-slate-700/50 px-4 py-1.5 rounded-full text-[11px] font-medium text-slate-300 transition-colors active:scale-95"
                    >
                      {chip}
@@ -420,7 +414,7 @@ const App: React.FC = () => {
                    <div className="w-10 h-10 rounded-full border-2 border-emerald-500/20 flex items-center justify-center mb-1">
                       <div className="w-6 h-6 rounded-full bg-emerald-500 animate-pulse"></div>
                    </div>
-                   <span className="text-[8px] font-bold text-emerald-500 uppercase">Live Voice</span>
+                   <span className="text-[8px] font-bold text-emerald-500 uppercase">Suara Aktif</span>
                 </div>
               )}
             </div>
@@ -428,7 +422,6 @@ const App: React.FC = () => {
         </div>
       </main>
 
-      {/* Decorative Gradient */}
       <div className="fixed -bottom-64 -right-64 w-[600px] h-[600px] bg-emerald-600/5 blur-[120px] rounded-full pointer-events-none -z-10"></div>
       <div className="fixed -top-64 -left-64 w-[600px] h-[600px] bg-cyan-600/5 blur-[120px] rounded-full pointer-events-none -z-10"></div>
     </div>
