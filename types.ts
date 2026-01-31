@@ -14,8 +14,12 @@ export enum SessionStatus {
   ERROR = 'ERROR'
 }
 
+export type GrammarTense = 'Present (Situasi)' | 'Past (Masa Lalu)' | 'Future (Rencana)';
+
 export interface LearningConfig {
   language: string;
   level: 'Starter' | 'Beginner' | 'Intermediate' | 'Advanced';
   focus: 'Fluency' | 'Grammar' | 'Vocabulary' | 'Pronunciation';
+  topic: string;
+  currentTense: GrammarTense;
 }
